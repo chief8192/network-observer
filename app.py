@@ -43,7 +43,13 @@ from threading import Thread, RLock
 
 @functools.cache
 def LoadConfigJson():
-    with open("/config.json") as f:
+
+    config_path = "/config.json"
+    if not os.path.isfile(config_path):
+        print("config.json not found")
+        sys.exit(1)
+
+    with open(config_path) as f:
         return json.load(f)
 
 
