@@ -6,7 +6,7 @@ connections or disconnections.
 ## Building
 
 ```shell
-$ sudo docker build --tag "chief8192/observer" .
+$ sudo docker build --tag "chief8192/network-observer" .
 ```
 
 ## Configuring
