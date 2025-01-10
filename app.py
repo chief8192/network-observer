@@ -24,10 +24,8 @@
 # SOFTWARE.
 
 import datetime
-import docker
 import functools
 import http.client
-import itertools
 import json
 import nmap
 import os
