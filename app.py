@@ -35,6 +35,7 @@ import sys
 import time
 import urllib
 
+from pushoverutil import Push
 from scapy.all import arping
 from threading import Thread, RLock
 
@@ -139,27 +140,9 @@ class BaseThread(Thread):
             return self.running
 
     def Pushover(self, message):
-
         print(message)
-
-        if not self.pushover_enabled:
-            return
-
-        conn = http.client.HTTPSConnection("api.pushover.net:443")
-        conn.request(
-            "POST",
-            "/1/messages.json",
-            urllib.parse.urlencode(
-                {
-                    "message": message,
-                    "priority": 1,  # high priority
-                    "token": self.pushover_app_token,
-                    "user": self.pushover_user_key,
-                }
-            ),
-            {"Content-type": "application/x-www-form-urlencoded"},
-        )
-        conn.getresponse()
+        if self.pushover_enabled:
+            Push(self.pushover_user_key, self.pushover_app_token, message)
 
     def run(self):
         try:
