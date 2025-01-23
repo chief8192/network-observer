@@ -47,7 +47,7 @@ $ sudo docker run \
     --name="network-observer" \
     --network="host" \
     --restart="always" \
-    --volume="${PWD}/config.json:/config.json" \
+    --volume="${PWD}/config.json:/config.json:ro" \
     "chief8192/network-observer:latest"
 ```
 
