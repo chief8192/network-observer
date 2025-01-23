@@ -139,16 +139,16 @@ class BaseThread(Thread):
         with self.lock:
             return self.running
 
-    def Pushover(self, message):
-        print(message)
+    def Pushover(self, title, message):
+        print(f"{title}. {message}")
         if self.pushover_enabled:
-            Push(self.pushover_user_key, self.pushover_app_token, message)
+            Push(self.pushover_user_key, self.pushover_app_token, message, title=title)
 
     def run(self):
         try:
             self.InnerRun()
         except Exception as e:
-            self.Pushover(f"{e.__class__.__name__}: {str(e)}")
+            self.Pushover("network-observer", f"{e.__class__.__name__}: {str(e)}")
 
 
 class ArpThread(BaseThread):
@@ -218,14 +218,19 @@ class ArpThread(BaseThread):
                     elif IsOlderThan(last_seen_time, minutes=10):
                         name = self.permanent_devices[mac]
                         time_since = TimeSince(last_seen_time)
-                        self.Pushover(f"{name} is back online after {time_since}")
+                        self.Pushover(
+                            "Device back online",
+                            f"{name} is back online after {time_since}",
+                        )
 
                 # If an interloper device has appeared since the last scan, then
                 # notify, but only if it's been > 6h since it was last seen.
                 elif mac in self.interloper_devices:
                     if not last_seen_time or IsOlderThan(last_seen_time, hours=6):
                         name = self.interloper_devices[mac]
-                        self.Pushover(f"{name} has connected as {ip}")
+                        self.Pushover(
+                            "Device connected", f"{name} has connected as {ip}"
+                        )
 
                 # Device is unknown, so periodically scan and alert.
                 else:
@@ -234,7 +239,8 @@ class ArpThread(BaseThread):
                         last_alert_times[mac] = Now()
                         vendor = GetMacVendor(mac)
                         self.Pushover(
-                            f"Unknown '{vendor}' device connected (MAC: {mac}, IP: {ip})"
+                            "Unknown device detected",
+                            f"Unknown '{vendor}' device connected (MAC: {mac}, IP: {ip})",
                         )
 
                         # Kick off a scan of the unknown device.
@@ -254,7 +260,7 @@ class ArpThread(BaseThread):
 
                 if recently_went_offline and have_not_recently_alerted:
                     last_alert_times[mac] = Now()
-                    self.Pushover(f"{name} has gone offline")
+                    self.Pushover("Device offline", f"{name} has gone offline")
 
             previous_devices = current_devices
 
@@ -283,7 +289,8 @@ class NmapThread(BaseThread):
             osmatch = "????"
 
         self.Pushover(
-            f"Device at {self.ip_address} scanned. Hostname: {hostname}, OS: {osmatch}"
+            "Device scanned",
+            f"Device at {self.ip_address} scanned. Hostname: {hostname}, OS: {osmatch}",
         )
 
 
